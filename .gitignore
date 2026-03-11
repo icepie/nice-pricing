@@ -1,0 +1,5 @@
+backend/nice-pricing
+backend/seed
+backend/pricing.db
+.claude/
+.playwright-mcp/

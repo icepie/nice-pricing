@@ -1,6 +1,7 @@
-import { App, Button, Form, Input, Modal, Popconfirm, Space, Table } from 'antd'
+import { App, Button, Form, Input, Modal, Popconfirm, Space, Table, Tooltip } from 'antd'
 import { useEffect, useState } from 'react'
 import { api, type Provider } from '../api/client'
+import ProviderIcon from '../components/ProviderIcon'
 
 export default function Providers() {
   const { message } = App.useApp()
@@ -46,8 +47,20 @@ export default function Providers() {
 
   const columns = [
     { title: 'ID', dataIndex: 'id', width: 60 },
+    {
+      title: '图标',
+      width: 60,
+      render: (_: unknown, p: Provider) => (
+        <ProviderIcon provider={p.name} iconName={p.icon || p.name} size={24} />
+      ),
+    },
     { title: '名称', dataIndex: 'name' },
     { title: '官网', dataIndex: 'website', render: (v: string) => v ? <a href={v} target="_blank" rel="noreferrer">{v}</a> : '—' },
+    {
+      title: '图标标识',
+      dataIndex: 'icon',
+      render: (v: string) => v ? <code style={{ fontSize: 12 }}>{v}</code> : <span style={{ color: '#bbb' }}>—</span>,
+    },
     {
       title: '操作',
       render: (_: unknown, p: Provider) => (
@@ -84,6 +97,16 @@ export default function Providers() {
           </Form.Item>
           <Form.Item label="官网" name="website">
             <Input placeholder="https://openai.com" />
+          </Form.Item>
+          <Form.Item
+            label={
+              <Tooltip title="使用 @lobehub/icons 的图标标识，如 OpenAI、OpenAI.Color、Anthropic、Google 等">
+                图标标识 <span style={{ color: '#999', fontWeight: 400 }}>(?)</span>
+              </Tooltip>
+            }
+            name="icon"
+          >
+            <Input placeholder="OpenAI.Color" />
           </Form.Item>
         </Form>
       </Modal>

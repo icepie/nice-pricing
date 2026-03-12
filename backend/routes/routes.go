@@ -1,6 +1,10 @@
 package routes
 
 import (
+	"embed"
+	"io/fs"
+	"net/http"
+
 	"nice-pricing/config"
 	"nice-pricing/handlers"
 
@@ -8,7 +12,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func Setup(r *gin.Engine) {
+func Setup(r *gin.Engine, staticFiles embed.FS) {
 	r.Use(cors.New(cors.Config{
 		AllowOrigins: config.C.CORSOrigins,
 		AllowMethods: []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
@@ -45,4 +49,18 @@ func Setup(r *gin.Engine) {
 		api.GET("/pricing", handlers.NewAPIPricing)
 		api.GET("/ratio_config", handlers.NewAPIRatioConfig)
 	}
+
+	// Serve embedded frontend; fallback to index.html for SPA routing
+	distFS, _ := fs.Sub(staticFiles, "dist")
+	fileServer := http.FileServer(http.FS(distFS))
+	r.NoRoute(func(c *gin.Context) {
+		// Try to serve the file; if not found, serve index.html
+		_, err := distFS.Open(c.Request.URL.Path[1:])
+		if err != nil {
+			c.FileFromFS("index.html", http.FS(distFS))
+			return
+		}
+		fileServer.ServeHTTP(c.Writer, c.Request)
+	})
 }
+

@@ -6,6 +6,7 @@ type Provider struct {
 	ID      uint   `json:"id" gorm:"primaryKey"`
 	Name    string `json:"name" gorm:"not null;unique"`
 	Website string `json:"website"`
+	Icon    string `json:"icon"`
 }
 
 type AIModel struct {

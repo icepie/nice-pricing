@@ -6,6 +6,7 @@ export interface Provider {
   id: number
   name: string
   website: string
+  icon: string
 }
 
 export interface AIModel {
@@ -15,6 +16,7 @@ export interface AIModel {
   name: string
   display_name: string
   context_window: number
+  icon: string
   enabled: boolean
 }
 

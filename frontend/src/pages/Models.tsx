@@ -1,7 +1,8 @@
-import { App, Badge, Button, Form, Input, InputNumber, Modal, Popconfirm, Select, Space, Table, Tag, Typography } from 'antd'
+import { App, Badge, Button, Form, Input, InputNumber, Modal, Popconfirm, Select, Space, Table, Tag, Tooltip, Typography } from 'antd'
 import { useEffect, useMemo, useState } from 'react'
 import { api, type AIModel, type Provider } from '../api/client'
 import { PriceFormModal, PriceHistoryModal } from '../components/PriceForm'
+import ProviderIcon from '../components/ProviderIcon'
 
 const { Text } = Typography
 
@@ -77,16 +78,24 @@ export default function Models() {
     {
       title: '服务商',
       dataIndex: ['provider', 'name'],
-      render: (name: string) => <Tag color="blue">{name}</Tag>,
+      render: (name: string, m: AIModel) => (
+        <Space size={6}>
+          <ProviderIcon provider={name} iconName={m.provider?.icon || name} size={18} />
+          <Tag color="blue">{name}</Tag>
+        </Space>
+      ),
       filters: providers.map((p) => ({ text: p.name, value: p.id })),
       onFilter: (value: unknown, record: AIModel) => record.provider_id === value,
     },
     {
       title: '模型',
       render: (_: unknown, m: AIModel) => (
-        <div style={{ opacity: m.enabled ? 1 : 0.45 }}>
-          <div>{m.display_name || m.name}</div>
-          {m.display_name && <Text type="secondary" style={{ fontSize: 12 }}>{m.name}</Text>}
+        <div style={{ opacity: m.enabled ? 1 : 0.45, display: 'flex', alignItems: 'center', gap: 8 }}>
+          <ProviderIcon provider={m.provider?.name || ''} iconName={m.icon || m.provider?.icon || m.provider?.name || ''} size={18} />
+          <div>
+            <div>{m.display_name || m.name}</div>
+            {m.display_name && <Text type="secondary" style={{ fontSize: 12 }}>{m.name}</Text>}
+          </div>
         </div>
       ),
     },
@@ -221,6 +230,16 @@ export default function Models() {
           </Form.Item>
           <Form.Item label="上下文窗口 (tokens)" name="context_window">
             <InputNumber style={{ width: '100%' }} placeholder="128000" />
+          </Form.Item>
+          <Form.Item
+            label={
+              <Tooltip title="使用 @lobehub/icons 的图标标识，留空则继承服务商图标，如 OpenAI.Color、Gemini 等">
+                图标标识 <span style={{ color: '#999', fontWeight: 400 }}>(?)</span>
+              </Tooltip>
+            }
+            name="icon"
+          >
+            <Input placeholder="留空继承服务商图标" />
           </Form.Item>
           <Form.Item label="描述" name="description">
             <Input placeholder="可选" />

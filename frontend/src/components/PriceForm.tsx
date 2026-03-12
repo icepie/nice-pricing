@@ -1,4 +1,4 @@
-import { App, Form, InputNumber, Modal, Table, Typography } from 'antd'
+import { App, Form, Input, InputNumber, Modal, Table, Typography } from 'antd'
 import { useEffect, useState } from 'react'
 import { api, type PriceHistory } from '../api/client'
 
@@ -24,8 +24,12 @@ export function PriceFormModal({ modelId, modelName, open, onClose, onSaved }: P
 
   const handleOk = async () => {
     const values = await form.validateFields()
+    // replace null (cleared InputNumber) with 0
+    const cleaned = Object.fromEntries(
+      Object.entries(values).map(([k, v]) => [k, v === null || v === undefined ? 0 : v])
+    )
     try {
-      await api.prices.upsert(modelId, { ...values, currency: 'USD' })
+      await api.prices.upsert(modelId, { ...cleaned, currency: 'USD' })
       message.success('价格已保存')
       onSaved()
       onClose()
@@ -38,10 +42,10 @@ export function PriceFormModal({ modelId, modelName, open, onClose, onSaved }: P
     <Modal title={`编辑价格 — ${modelName}`} open={open} onCancel={onClose} onOk={handleOk} okText="保存" cancelText="取消" width={560}>
       <Form form={form} layout="vertical">
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 16px' }}>
-          <Form.Item label="输入价格 ($/1M)" name="input_price_per_1m" rules={[{ required: true }]}>
+          <Form.Item label="输入价格 ($/1M)" name="input_price_per_1m">
             <InputNumber min={0} step={0.001} style={{ width: '100%' }} />
           </Form.Item>
-          <Form.Item label="输出价格 ($/1M)" name="output_price_per_1m" rules={[{ required: true }]}>
+          <Form.Item label="输出价格 ($/1M)" name="output_price_per_1m">
             <InputNumber min={0} step={0.001} style={{ width: '100%' }} />
           </Form.Item>
           <Form.Item label="缓存读取价格 ($/1M)" name="cache_read_price_per_1m">
@@ -58,7 +62,7 @@ export function PriceFormModal({ modelId, modelName, open, onClose, onSaved }: P
           </Form.Item>
         </div>
         <Form.Item label="备注" name="notes">
-          <input className="ant-input" placeholder="可选" style={{ width: '100%' }} />
+          <Input placeholder="可选" />
         </Form.Item>
       </Form>
     </Modal>

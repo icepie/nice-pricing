@@ -1,0 +1,13 @@
+services:
+  nice-pricing:
+    image: icepie/nice-pricing:latest
+    container_name: nice-pricing
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./data:/data
+    environment:
+      - PORT=8080
+      - DB_PATH=/data/pricing.db
+      # - CORS_ORIGINS=https://your-domain.com

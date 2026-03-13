@@ -14,7 +14,7 @@ COPY backend/go.mod backend/go.sum ./
 RUN go mod download
 COPY backend/ ./
 COPY --from=frontend /app/frontend/dist ./dist
-RUN CGO_ENABLED=1 GOOS=linux go build -o nice-pricing .
+RUN CGO_ENABLED=0 GOOS=linux go build -o nice-pricing .
 
 # Stage 3: Runtime
 FROM alpine:3.21

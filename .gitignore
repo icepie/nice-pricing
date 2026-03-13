@@ -1,5 +1,6 @@
 backend/nice-pricing
 backend/seed
 backend/pricing.db
+backend/dist/
 .claude/
 .playwright-mcp/
